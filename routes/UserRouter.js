@@ -97,3 +97,18 @@ UserRouter.post('/login', async (req, res) => {
 });
 
 // delete account 
+
+UserRouter.delete('/:id', async (req, res) => {
+    try{
+        if(req.user.userId !== req.params.id){
+            return res.status(403).json({error: "Access denied"})
+        }
+
+        await prisma.user.delete({
+            where: {id: req.params.id}
+        });
+        res.status(204).send()
+    } catch (err) {
+        res.status(400).json({error: error.message})
+    }
+});
