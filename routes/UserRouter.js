@@ -66,10 +66,34 @@ UserRouter.post('/guest', async (req, res) => {
   }
 });
 
-
-    
-
-
-
 // login
+UserRouter.post('/login', async (req, res) => {
+    try {
+        const{email, password} = req.body;
+        const user = prisma.user.findUnique({where: {email}});
+
+        if(!user) {
+            return res.status(401).json({error: 'Invalid Email'})
+        };
+
+        const validPassword = await bcrypt.compare(password, user.password);
+        if (!validPassword) {
+            return res.status(401).json({error: 'Invalid password'});
+        }
+
+        const token = jwt.sign(
+            {
+                userId: user.id,
+                email: user.email
+            },
+            process.env.JWT_SECRET
+        );
+
+        res.json({token, userId: user.id})
+        
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+});
+
 // delete account 
