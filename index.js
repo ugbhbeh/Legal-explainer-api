@@ -6,8 +6,8 @@ const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
 const UserRouter = require("./routes/UserRouter.js");
 const ChatRouter = require("./routes/ChatRouter.js");
-const { Socket } = require("dgram");
-const { error } = require("console");
+
+
 
 require("dotenv").config();
 
