@@ -34,8 +34,42 @@ UserRouter.post('/', async (req, res) => {
     }
 });
 
+// Guest user
+UserRouter.post('/guest', async (req, res) => {
+  try {
+    const timestamp = Date.now();
+    const guestEmail = `guest_${timestamp}@guest.local`;
+    const guestPassword = `guest_${timestamp}hguh${timestamp}`;
+    const hashedPassword = await bcrypt.hash(guestPassword, 10);
+
+    const guestUser = await prisma.user.create({
+      data: {
+        email: guestEmail,
+        password: hashedPassword,
+        name: guestEmail,
+      },
+    });
+
+    const token = jwt.sign(
+      { userId: guestUser.id },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    res.json({
+      token,
+      userId: guestUser.id,
+    });
+  } catch (err) {
+    console.error('Guest login error:', err);
+    res.status(500).json({ error: 'Failed to create guest user' });
+  }
+});
+
+
+    
+
 
 
 // login
-// guest user 
 // delete account 
