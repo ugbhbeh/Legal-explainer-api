@@ -33,3 +33,21 @@ ChatRouter.post("/", authenticateToken, async (req, res) => {
     }
 
 });
+
+// fetch all convo's for a logged in user
+
+ChatRouter.get("/", authenticateToken, async (req, res) => {
+    const userId = req.userId;
+
+    try{
+        const conversation = await prisma.conversation.findMany({
+            where: { userId },
+            orderBy: {createdAt: "desc"}
+        });
+
+        res.json({conversation})
+    } catch (error) {
+        console.error("Error fetching conversations", error);
+        res.status(500).json({error: "Failed to fetch conversations"})
+    }
+});
