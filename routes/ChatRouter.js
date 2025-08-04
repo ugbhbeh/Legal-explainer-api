@@ -34,7 +34,7 @@ ChatRouter.post("/", authenticateToken, async (req, res) => {
 
 });
 
-// fetch all convo's for a logged in user
+// fetch all chats of a logged in user
 
 ChatRouter.get("/", authenticateToken, async (req, res) => {
     const userId = req.userId;
@@ -49,5 +49,44 @@ ChatRouter.get("/", authenticateToken, async (req, res) => {
     } catch (error) {
         console.error("Error fetching conversations", error);
         res.status(500).json({error: "Failed to fetch conversations"})
+    }
+});
+
+// fetch a single chat by ID
+
+ChatRouter.get("/:id", authenticateToken, async (req, res) => {
+    const userId = req.userId;
+    const {id} = req.params
+
+    try {
+        const convo = await prisma.conversation.findFirst({
+            where: {id, userId}
+        });
+
+        if(!convo ) return res.status(404).json({error:"Conversation not found"});
+
+        res.json({conversation: convo});
+    } catch (error) {
+        console.error("error fetching conversation by id", error);
+        res.status(500).json({error: "Failed to fetch conversation by id"});
+    }   
+});
+
+ChatRouter.delete("/:id", authenticateToken, async(req, res) => {
+    const userId = req.userId;
+    const {id} = req.params;
+
+    try{
+        const deleted = await prisma.conversation.deleteMany({
+            where: {id, userId},
+        });
+
+        if(deleted.count === 0) {
+            return res.status(404).json({error: "No conversation found"});   
+        }
+         res.json({success: true});
+    } catch (error) {
+        console.error("error deleting", error);
+        res.status(500).json({error:"Failed to delete conversation"})
     }
 });
