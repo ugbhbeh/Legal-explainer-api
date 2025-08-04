@@ -24,6 +24,18 @@ model User {
 
   documents     Document[]
   explanations  Explanation[]
+  conversations Conversation[]
+
+}
+
+model Conversation {
+  id         String   @id @default(uuid())
+  userId     String
+  input      String
+  response   String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Document {
