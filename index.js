@@ -4,12 +4,12 @@ const { Server } = require("socket.io");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("@prisma/client");
+require("dotenv").config();
+
 const UserRouter = require("./routes/UserRouter.js");
 const ChatRouter = require("./routes/ChatRouter.js");
-
-
-
-require("dotenv").config();
+const DocumentRouter = require("./routes/DocumentRouter.js");
+const ExplanationRouter = require("./routes/ExplanationRouter.js");
 
 const app = express();
 const httpServer = http.createServer(app); 
@@ -23,12 +23,15 @@ const io = new Server(httpServer, {
 const prisma = new PrismaClient();
 const port = 8080;
 
+
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/users", UserRouter); 
 app.use("/chats", ChatRouter);
+app.use("/document", DocumentRouter);
+app.use("/explanations", ExplanationRouter);
 
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
