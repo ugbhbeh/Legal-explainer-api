@@ -2,7 +2,7 @@ const {Router, json} = require("express");
 const {PrismaClient} = require("@prisma/client");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
-const {authenticateToken} = require("../services/Auth");
+const authenticateToken = require("../services/Auth")
 const UserRouter = Router();
 const prisma = new PrismaClient();
 const md5 = require('md5');
@@ -67,7 +67,7 @@ UserRouter.post('/guest', async (req, res) => {
 });
 
 // login
-UserRouter.post('/login', authenticateToken, async (req, res) => {
+UserRouter.post('/login', async (req, res) => {
     try {
         const{email, password} = req.body;
         const user = prisma.user.findUnique({where: {email}});
@@ -112,3 +112,5 @@ UserRouter.delete('/:id', authenticateToken,  async (req, res) => {
         res.status(400).json({error: error.message})
     }
 });
+
+module.exports = UserRouter;

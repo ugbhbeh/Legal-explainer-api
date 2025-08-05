@@ -90,3 +90,5 @@ ChatRouter.delete("/:id", authenticateToken, async(req, res) => {
         res.status(500).json({error:"Failed to delete conversation"})
     }
 });
+
+module.exports = ChatRouter;
