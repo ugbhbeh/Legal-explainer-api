@@ -2,7 +2,7 @@ const {Router, json} = require("express");
 const {PrismaClient} = require("@prisma/client");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
-const {authenticateToken} = require("../middleware/Auth");
+const {authenticateToken} = require("../services/Auth");
 const UserRouter = Router();
 const prisma = new PrismaClient();
 const md5 = require('md5');
@@ -67,7 +67,7 @@ UserRouter.post('/guest', async (req, res) => {
 });
 
 // login
-UserRouter.post('/login', async (req, res) => {
+UserRouter.post('/login', authenticateToken, async (req, res) => {
     try {
         const{email, password} = req.body;
         const user = prisma.user.findUnique({where: {email}});
@@ -98,7 +98,7 @@ UserRouter.post('/login', async (req, res) => {
 
 // delete account 
 
-UserRouter.delete('/:id', async (req, res) => {
+UserRouter.delete('/:id', authenticateToken,  async (req, res) => {
     try{
         if(req.user.userId !== req.params.id){
             return res.status(403).json({error: "Access denied"})

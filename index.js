@@ -3,7 +3,8 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
+
 require("dotenv").config();
 
 const UserRouter = require("./routes/UserRouter.js");
