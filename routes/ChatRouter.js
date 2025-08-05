@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 // send user input to gpt, save and return the response
 
-ChatRouter.post("/", authenticateToken, async (req, res) => {
+ChatRouter.post("/", async (req, res) => {
     const userId = req.userId;
     const {input, tone } = req.body;
 
