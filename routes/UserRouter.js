@@ -70,7 +70,7 @@ UserRouter.post('/guest', async (req, res) => {
 UserRouter.post('/login', async (req, res) => {
     try {
         const{email, password} = req.body;
-        const user = prisma.user.findUnique({where: {email}});
+        const user = await prisma.user.findUnique({where: {email}});
 
         if(!user) {
             return res.status(401).json({error: 'Invalid Email'})
