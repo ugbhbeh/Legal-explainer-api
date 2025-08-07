@@ -3,7 +3,7 @@ const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-
+const { PrismaClient } = require('@prisma/client');
 
 require("dotenv").config();
 
@@ -42,6 +42,13 @@ app.use("/chats", ChatRouter);
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
     if (!token) return next(new Error("Invalid token"));
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        socket.user = decoded;
+        next();
+    } catch (err) {
+        return next(new Error("Authentication failed"));
+    }
 });
 
 httpServer.listen(port, () => {
