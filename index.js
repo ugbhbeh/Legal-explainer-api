@@ -9,7 +9,7 @@ dotenv.config();
 
 const UserRouter = require("./routes/UserRouter.js");
 const ChatRouter = require("./routes/ChatRouter.js");
-//const DocumentRouter = require("./routes/DocumentRouter.js");
+const DocumentRouter = require("./routes/DocumentRouter.js");
 //const ExplanationRouter = require("./routes/ExplanationRouter.js");
 
 const app = express();
@@ -36,7 +36,7 @@ app.use(express.json());
 
 app.use("/users", UserRouter); 
 app.use("/chats", ChatRouter);
-//app.use("/document", DocumentRouter);
+app.use("/document", DocumentRouter);
 //app.use("/explanations", ExplanationRouter);
 
 io.use((socket, next) => {
