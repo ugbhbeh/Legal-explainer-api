@@ -1,4 +1,4 @@
-const {Router, json} = require("express");
+const {Router} = require("express");
 const {PrismaClient} = require("@prisma/client");
 const jwt = require("jsonwebtoken");
 const bcrypt = require('bcrypt');
