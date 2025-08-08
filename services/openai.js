@@ -2,20 +2,34 @@ require("dotenv").config();
 const ModelClient = require("@azure-rest/ai-inference").default;
 const { isUnexpected } = require("@azure-rest/ai-inference");
 const { AzureKeyCredential } = require("@azure/core-auth");
-
+const prisma = new PrismaClient();
 const token = process.env["GITHUB_TOKEN"];
 const endpoint = "https://models.github.ai/inference";
 const model = "openai/gpt-4.1";
 
 const client = ModelClient(endpoint, new AzureKeyCredential(token));
 
-async function explainLegalText(text, tone = "simple") {
+async function explainLegalText({ text, documentId, tone = "simple" }) {
+  let contentToExplain = text;
+
+  if (documentId) {
+    const doc = await prisma.document.findUnique({
+      where: { id: documentId },
+      select: { content: true },
+    });
+
+    if (!doc) throw new Error("Document not found");
+
+    contentToExplain = doc.content;
+  }
+
   const prompt = `
 You are an AI legal assistant. Explain the following legal content in ${tone} plain English.
 Avoid legal jargon. Highlight anything risky or unusual.
 Text:
-${text}
+${contentToExplain}
 `;
+
   const response = await client.path("/chat/completions").post({
     body: {
       model,
