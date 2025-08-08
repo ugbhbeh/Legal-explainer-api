@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt');
 const authenticateToken = require("../services/Auth")
 const UserRouter = Router();
 const prisma = new PrismaClient();
-const md5 = require('md5');
 
 //sign up 
 
