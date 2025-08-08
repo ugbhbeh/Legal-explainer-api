@@ -1,24 +1,46 @@
 import multer from "multer";
 import express from "express";
-const DocumentRouter = express.Router();
-const prisma = new PrismaClient();
-import OpenAI from "openai";
+import { PrismaClient } from "@prisma/client";
+import { explainLegalText } from "../services/explainLegalText"; // Adjust path if needed
 const authenticateToken = require('../services/Auth');
-import { parseAndStoreDocument } from "../services/documentService.js";
 
-DocumentRouter.post("/", authenticateToken, async(req, res) => {
-    const {documentId, question} = req.body;
+const prisma = new PrismaClient();
+const DocumentRouter = express.Router();
+
+DocumentRouter.post("/", authenticateToken, async (req, res) => {
+  try {
+    const { documentId, question, tone } = req.body;
+    if (!documentId || !question) {
+      return res.status(400).json({ error: "documentId and question are required" });
+    }
+
     const doc = await prisma.document.findUnique({
-        where: {id: documentId},
-        include: {chunks: true}
+      where: { id: documentId },
+      include: { chunks: true }
     });
-     const relevantText = doc.chunks
-    .sort((a, b) => a.position - b.position)
-    .map(c => c.text)
-    .join("\n\n");
 
-    const responseText = await explainLegalText(input, tone || "neutral");
-    res.json({ answer: completion.choices[0].message.content });
-})
+    if (!doc) {
+      return res.status(404).json({ error: "Document not found" });
+    }
+
+    const relevantText = doc.chunks
+      .sort((a, b) => a.position - b.position)
+      .map(chunk => chunk.text)
+      .join("\n\n");
+
+    const input = `
+Question: ${question}
+Document:
+${relevantText}
+    `;
+
+    const explanation = await explainLegalText({ text: input, tone: tone || "neutral" });
+
+    return res.json({ answer: explanation });
+  } catch (error) {
+    console.error("Error in /document explain route:", error);
+    return res.status(500).json({ error: error.message || "Internal server error" });
+  }
+});
 
 export default DocumentRouter;
