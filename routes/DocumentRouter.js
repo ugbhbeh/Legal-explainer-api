@@ -10,6 +10,8 @@ const DocumentRouter = express.Router();
 DocumentRouter.post("/", authenticateToken, async (req, res) => {
   try {
     const { documentId, question, tone } = req.body;
+    const userId = req.user.id; 
+    
     if (!documentId || !question) {
       return res.status(400).json({ error: "documentId and question are required" });
     }
@@ -36,6 +38,14 @@ ${relevantText}
 
     const explanation = await explainLegalText({ text: input, tone: tone || "neutral" });
 
+    await prisma.explanation.create({
+      data: {
+        userId,
+        documentId,
+        summary: explanation,
+        tone: tone || "neutral",
+      }
+    });
     return res.json({ answer: explanation });
   } catch (error) {
     console.error("Error in /document explain route:", error);
