@@ -2,7 +2,8 @@ require("dotenv").config();
 const ModelClient = require("@azure-rest/ai-inference").default;
 const { isUnexpected } = require("@azure-rest/ai-inference");
 const { AzureKeyCredential } = require("@azure/core-auth");
-const prisma = new PrismaClient();
+const  {PrismaClient} = require ("@prisma/client");
+const prisma = new PrismaClient()
 const token = process.env["GITHUB_TOKEN"];
 const endpoint = "https://models.github.ai/inference";
 const model = "openai/gpt-4.1";

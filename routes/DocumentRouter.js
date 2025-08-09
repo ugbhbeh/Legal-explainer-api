@@ -1,17 +1,33 @@
-import multer from "multer";
-import express from "express";
-import { PrismaClient } from "@prisma/client";
-import { explainLegalText } from "../services/explainLegalText"; // Adjust path if needed
-const authenticateToken = require('../services/Auth');
+
+const multer = require("multer");
+const express = require("express");
+const { PrismaClient } = require("@prisma/client");
+const { explainLegalText } = require("../services/openai");
+const parseAndStoreDocument = require("../services/documentService");
+const authenticateToken = require("../services/Auth");
+
 
 const prisma = new PrismaClient();
 const DocumentRouter = express.Router();
+const upload = multer({ dest: "uploads/" });
+
+DocumentRouter.post("/upload", authenticateToken, upload.single("file"), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+  const doc = await parseAndStoreDocument(req.file);
+  res.json({ documentId: doc.id });
+  } catch (err) {
+    console.error("Upload error:", err);
+    res.status(500).json({ error: "Failed to process document" });
+  }
+});
 
 DocumentRouter.post("/", authenticateToken, async (req, res) => {
   try {
     const { documentId, question, tone } = req.body;
-    const userId = req.user.id; 
-    
+    const userId = req.user.id;
+
     if (!documentId || !question) {
       return res.status(400).json({ error: "documentId and question are required" });
     }
@@ -36,7 +52,7 @@ Document:
 ${relevantText}
     `;
 
-    const explanation = await explainLegalText({ text: input, tone: tone || "neutral" });
+  const explanation = await explainLegalText({ text: input, tone: tone || "neutral" });
 
     await prisma.explanation.create({
       data: {
@@ -53,4 +69,4 @@ ${relevantText}
   }
 });
 
-export default DocumentRouter;
+module.exports = DocumentRouter;

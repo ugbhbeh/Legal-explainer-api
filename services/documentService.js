@@ -1,10 +1,9 @@
-// services/documentService.js
-import fs from "fs";
-import pdf from "pdf-parse";
-import { prisma } from "../prismaClient.js";
-import { chunkText } from "../utils/chunkText.js";
 
-export async function parseAndStoreDocument(file) {
+const fs = require("fs");
+const pdf = require ("pdf-parse");
+
+
+ async function parseAndStoreDocument(file) {
   const buffer = fs.readFileSync(file.path);
   const data = await pdf(buffer);
 
@@ -30,3 +29,5 @@ export async function parseAndStoreDocument(file) {
 
   return docRecord;
 }
+
+module.exports = parseAndStoreDocument
