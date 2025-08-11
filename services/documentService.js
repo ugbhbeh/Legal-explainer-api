@@ -8,8 +8,6 @@ const prisma = new PrismaClient()
 
 async function parseAndStoreDocument(file, userId) {
   console.log('parseAndStoreDocument called');
-  console.log('Received file:', file);
-  console.log('Received userId:', userId);
 
   if (!file) {
     console.error('No file provided');
@@ -26,9 +24,7 @@ async function parseAndStoreDocument(file, userId) {
 
   console.log('Parsing PDF...');
   const data = await pdf(buffer);
-  console.log('PDF parsed. Extracted text length:', data.text.length);
-
-  console.log('Cleaning extracted text...');
+  
   const cleanedText = data.text
     .replace(/\n\s*\n/g, "\n\n") 
     .replace(/\s+/g, " ");

@@ -11,16 +11,11 @@ const DocumentRouter = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 DocumentRouter.post("/upload", authenticateToken, upload.single("file"), async (req, res) => {
-  console.log('--- /document/upload route called ---');
-  console.log('req.userId:', req.userId);
-  console.log('req.file:', req.file);
   try {
     if (!req.file) {
-      console.error('No file uploaded');
       return res.status(400).json({ error: "No file uploaded" });
     }
-    if (!req.userId) {
-      console.error('No userId found on request');
+    if (!req.userId) {     
       return res.status(400).json({ error: "No userId found" });
     }
     const doc = await parseAndStoreDocument(req.file, req.userId);
@@ -33,14 +28,10 @@ DocumentRouter.post("/upload", authenticateToken, upload.single("file"), async (
 });
 
 DocumentRouter.post("/", authenticateToken, async (req, res) => {
-  console.log('--- /document route called ---');
-  console.log('req.userId:', req.userId);
-  console.log('req.body:', req.body);
   try {
     const { documentId, question, tone } = req.body;
     const userId = req.userId;
     if (!documentId || !question) {
-      console.error('Missing documentId or question');
       return res.status(400).json({ error: "documentId and question are required" });
     }
     const doc = await prisma.document.findUnique({
@@ -48,7 +39,6 @@ DocumentRouter.post("/", authenticateToken, async (req, res) => {
       include: { chunks: true }
     });
     if (!doc) {
-      console.error('Document not found for id:', documentId);
       return res.status(404).json({ error: "Document not found" });
     }
     const relevantText = doc.chunks
@@ -60,7 +50,6 @@ Question: ${question}
 Document:
 ${relevantText}
     `;
-    console.log('Sending input to explainLegalText:', { text: input, tone: tone || "neutral" });
     const explanation = await explainLegalText({ text: input, tone: tone || "neutral" });
     await prisma.explanation.create({
       data: {
