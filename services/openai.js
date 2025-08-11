@@ -10,23 +10,33 @@ const model = "openai/gpt-4.1";
 
 const client = ModelClient(endpoint, new AzureKeyCredential(token));
 
-async function explainLegalText({ text, documentId, tone = "simple" }) {
-  let contentToExplain = text;
+async function explainLegalText(textOrOptions, optionalTone) {
+  let contentToExplain;
+  let tone;
 
-  if (documentId) {
-    const doc = await prisma.document.findUnique({
-      where: { id: documentId },
-      select: { content: true },
-    });
-
-    if (!doc) throw new Error("Document not found");
-
-    contentToExplain = doc.content;
+  // Handle both old and new calling styles
+  if (typeof textOrOptions === 'string') {
+    contentToExplain = textOrOptions;
+    tone = optionalTone || 'simple';
+  } else {
+    const { text, documentId, tone: optionsTone = 'simple' } = textOrOptions;
+    tone = optionsTone;
+    
+    if (documentId) {
+      const doc = await prisma.document.findUnique({
+        where: { id: documentId },
+        select: { content: true },
+      });
+      if (!doc) throw new Error("Document not found");
+      contentToExplain = doc.content;
+    } else {
+      contentToExplain = text;
+    }
   }
 
   const prompt = `
 You are an AI legal assistant. Explain the following legal content in ${tone} plain English.
-Avoid legal jargon. Highlight anything risky or unusual.
+Avoid legal jargon. Highlight anything risky or unusual if present.
 Text:
 ${contentToExplain}
 `;
