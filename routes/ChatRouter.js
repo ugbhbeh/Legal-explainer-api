@@ -37,39 +37,44 @@ ChatRouter.post("/", async (req, res) => {
 // fetch all chats of a logged in user
 
 ChatRouter.get("/", authenticateToken, async (req, res) => {
-    const userId = req.userId;
+  try {
+    const conversations = await prisma.conversation.findMany({
+      where: { userId: req.userId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        input: true,
+        response: true,
+        createdAt: true
+      }
+    });
 
-    try{
-        const conversation = await prisma.conversation.findMany({
-            where: { userId },
-            orderBy: {createdAt: "desc"}
-        });
-
-        res.json({conversation})
-    } catch (error) {
-        console.error("Error fetching conversations", error);
-        res.status(500).json({error: "Failed to fetch conversations"})
-    }
+    res.json({ conversations });
+  } catch (error) {
+    console.error(" ChatRouter/ error:", error);
+    res.status(500).json({ error: "Failed to fetch conversations" });
+  }
 });
 
-// fetch a single chat by ID
-
+// Fetch single chat by ID
 ChatRouter.get("/:id", authenticateToken, async (req, res) => {
-    const userId = req.userId;
-    const {id} = req.params
+  try {
+    const conversation = await prisma.conversation.findFirst({
+      where: {
+        id: req.params.id,
+        userId: req.userId
+      }
+    });
 
-    try {
-        const convo = await prisma.conversation.findFirst({
-            where: {id, userId}
-        });
+    if (!conversation) {
+      return res.status(404).json({ error: "Conversation not found" });
+    }
 
-        if(!convo ) return res.status(404).json({error:"Conversation not found"});
-
-        res.json({conversation: convo});
-    } catch (error) {
-        console.error("error fetching conversation by id", error);
-        res.status(500).json({error: "Failed to fetch conversation by id"});
-    }   
+    res.json({ conversation });
+  } catch (error) {
+    console.error("ChatRouter/:id error:", error);
+    res.status(500).json({ error: "Failed to fetch conversation" });
+  }
 });
 
 ChatRouter.delete("/:id", authenticateToken, async(req, res) => {
