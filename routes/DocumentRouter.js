@@ -10,6 +10,8 @@ const prisma = new PrismaClient();
 const DocumentRouter = express.Router();
 const upload = multer({ dest: "uploads/" });
 
+// uploading a file
+
 DocumentRouter.post("/upload", authenticateToken, upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
@@ -26,6 +28,51 @@ DocumentRouter.post("/upload", authenticateToken, upload.single("file"), async (
     res.status(500).json({ error: "Failed to process document" });
   }
 });
+
+// view all uploaded documents 
+
+DocumentRouter.get("/", authenticateToken, async (req, res) => {
+  try {
+    const documents = await prisma.document.findMany({
+      where: { userId: req.userId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    });
+    res.json({ documents });
+  } catch (error) {
+    console.error("GET /documents error:", error);
+    res.status(500).json({ error: "Failed to fetch documents" });
+  }
+});
+
+// view a single document with its attached explanation.
+
+DocumentRouter.get("/:id/with-explanation", authenticateToken, async (req, res) => {
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId: req.userId },
+      include: {
+        explanations: {
+          orderBy: { createdAt: "desc" }
+        }
+      }
+    });
+
+    if (!doc) return res.status(404).json({ error: "Document not found" });
+
+    res.json(doc);
+  } catch (error) {
+    console.error("GET /documents/:id/with-explanations error:", error);
+    res.status(500).json({ error: "Failed to fetch document with explanations" });
+  }
+});
+
+// explanation for attached file 
 
 DocumentRouter.post("/", authenticateToken, async (req, res) => {
   try {
@@ -66,5 +113,7 @@ ${relevantText}
     return res.status(500).json({ error: error.message || "Internal server error" });
   }
 });
+
+
 
 module.exports = DocumentRouter;
