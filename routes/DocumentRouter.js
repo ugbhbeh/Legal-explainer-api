@@ -72,7 +72,7 @@ DocumentRouter.get("/:id/with-explanation", authenticateToken, async (req, res) 
   }
 });
 
-// explanation for attached file 
+// explanation for an uploaded file 
 
 DocumentRouter.post("/", authenticateToken, async (req, res) => {
   try {
@@ -114,6 +114,41 @@ ${relevantText}
   }
 });
 
+// Delete document
+DocumentRouter.delete("/:id", authenticateToken, async (req, res) => {
+  try {
+    const existing = await prisma.document.findFirst({
+      where: { id: req.params.id, userId: req.userId }
+    });
 
+    if (!existing) return res.status(404).json({ error: "Document not found" });
+
+    await prisma.document.delete({ where: { id: req.params.id } });
+
+    res.json({ message: "Document deleted successfully" });
+  } catch (error) {
+    console.error("DELETE /documents/:id error:", error);
+    res.status(500).json({ error: "Failed to delete document" });
+  }
+});
+
+DocumentRouter.delete("/explanations/:id", authenticateToken, async (req, res) => {
+  try {
+    const existing = await prisma.explanation.findFirst({
+      where: { id: req.params.id, userId: req.userId }
+    });
+
+    if (!existing) {
+      return res.status(404).json({ error: "Explanation not found" });
+    }
+
+    await prisma.explanation.delete({ where: { id: req.params.id } });
+
+    res.json({ message: "Explanation deleted successfully" });
+  } catch (error) {
+    console.error("DELETE /documents/explanations/:id error:", error);
+    res.status(500).json({ error: "Failed to delete explanation" });
+  }
+});
 
 module.exports = DocumentRouter;
