@@ -1,5 +1,3 @@
-// Splits text into chunks of a specified max length, preserving word boundaries.
-// Returns an array of strings, each no longer than maxLength (unless a single word is longer).
 
 function chunkText(text, maxLength) {
   if (!text || typeof text !== 'string') return [];
@@ -10,7 +8,7 @@ function chunkText(text, maxLength) {
   let currentChunk = '';
 
   for (const word of words) {
-    // If adding the next word would exceed maxLength, push the current chunk and start a new one
+   
     if ((currentChunk + ' ' + word).trim().length > maxLength) {
       if (currentChunk) chunks.push(currentChunk.trim());
       currentChunk = word;

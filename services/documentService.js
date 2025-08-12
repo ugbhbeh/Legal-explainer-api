@@ -10,15 +10,14 @@ async function parseAndStoreDocument(file, userId) {
   console.log('parseAndStoreDocument called');
 
   if (!file) {
-    console.error('No file provided');
+    
     throw new Error('No file provided');
   }
   if (!userId) {
-    console.error('No userId provided');
+   
     throw new Error('No userId provided');
   }
 
-  console.log('Reading file from disk:', file.path);
   const buffer = fs.readFileSync(file.path);
   console.log('File read successfully, size:', buffer.length);
 

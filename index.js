@@ -10,7 +10,7 @@ dotenv.config();
 const UserRouter = require("./routes/UserRouter.js");
 const ChatRouter = require("./routes/ChatRouter.js");
 const DocumentRouter = require("./routes/DocumentRouter.js");
-//const ExplanationRouter = require("./routes/ExplanationRouter.js");
+const ArchiveRouter = require("./routes/ArchiveRouter.js")
 
 const app = express();
 const httpServer = http.createServer(app); 
@@ -37,7 +37,8 @@ app.use(express.json());
 app.use("/users", UserRouter); 
 app.use("/chats", ChatRouter);
 app.use("/document", DocumentRouter);
-//app.use("/explanations", ExplanationRouter);
+app.use("/archive", ArchiveRouter)
+
 
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
