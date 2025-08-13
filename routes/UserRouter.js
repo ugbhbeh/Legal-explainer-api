@@ -85,7 +85,8 @@ UserRouter.post('/login', async (req, res) => {
                 userId: user.id,
                 email: user.email
             },
-            process.env.JWT_SECRET
+            process.env.JWT_SECRET,
+             { expiresIn: '1d' }
         );
 
         res.json({token, userId: user.id})
