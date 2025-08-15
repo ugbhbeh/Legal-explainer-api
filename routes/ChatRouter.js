@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 // send user input to gpt, save and return the response
 
-ChatRouter.post("/", async (req, res) => {
+ChatRouter.post("/", authenticateToken,  async (req, res) => {
     const userId = req.userId;
     const {input, tone } = req.body;
 
@@ -27,6 +27,7 @@ ChatRouter.post("/", async (req, res) => {
         });
 
         res.json({conversation});
+        console.log(conversation)
     } catch (error) {
         console.log("Azure GPT error", error);
         res.status(500).json({error:"Failed to generate response"})
