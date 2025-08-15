@@ -114,41 +114,41 @@ ${relevantText}
   }
 });
 
-// Delete document
+// delete document 
+
 DocumentRouter.delete("/:id", authenticateToken, async (req, res) => {
   try {
-    const existing = await prisma.document.findFirst({
-      where: { id: req.params.id, userId: req.userId }
+    const documentId = req.params.id;
+    const userId = req.userId;
+
+    // Ensure the document belongs to the user
+    const existingDoc = await prisma.document.findFirst({
+      where: { id: documentId, userId },
     });
 
-    if (!existing) return res.status(404).json({ error: "Document not found" });
-
-    await prisma.document.delete({ where: { id: req.params.id } });
-
-    res.json({ message: "Document deleted successfully" });
-  } catch (error) {
-    console.error("DELETE /documents/:id error:", error);
-    res.status(500).json({ error: "Failed to delete document" });
-  }
-});
-
-DocumentRouter.delete("/explanations/:id", authenticateToken, async (req, res) => {
-  try {
-    const existing = await prisma.explanation.findFirst({
-      where: { id: req.params.id, userId: req.userId }
-    });
-
-    if (!existing) {
-      return res.status(404).json({ error: "Explanation not found" });
+    if (!existingDoc) {
+      return res.status(404).json({ error: "Document not found" });
     }
 
-    await prisma.explanation.delete({ where: { id: req.params.id } });
+    // Delete chunks, explanations, and document in a single transaction
+    await prisma.$transaction([
+      prisma.documentChunk.deleteMany({
+        where: { documentId },
+      }),
+      prisma.explanation.deleteMany({
+        where: { documentId, userId },
+      }),
+      prisma.document.delete({
+        where: { id: documentId },
+      }),
+    ]);
 
-    res.json({ message: "Explanation deleted successfully" });
+    res.json({ message: "Document, related chunks, and explanations deleted successfully" });
   } catch (error) {
-    console.error("DELETE /documents/explanations/:id error:", error);
-    res.status(500).json({ error: "Failed to delete explanation" });
+    console.error("DELETE /documents/:id error:", error);
+    res.status(500).json({ error: "Failed to delete document and related data" });
   }
 });
+
 
 module.exports = DocumentRouter;
