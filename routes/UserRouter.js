@@ -100,8 +100,8 @@ UserRouter.post('/login', async (req, res) => {
 
 UserRouter.delete('/:id', authenticateToken,  async (req, res) => {
     try{
-        if(req.user.userId !== req.params.id){
-            return res.status(403).json({error: "Access denied"})
+        if(req.userId !== req.params.id){
+            return res.status(403).json({error: "Access denied, "})
         }
 
         await prisma.user.delete({
