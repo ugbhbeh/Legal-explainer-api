@@ -27,7 +27,6 @@ ChatRouter.post("/", authenticateToken,  async (req, res) => {
         });
 
         res.json({conversation});
-        console.log(conversation)
     } catch (error) {
         console.log("Azure GPT error", error);
         res.status(500).json({error:"Failed to generate response"})
@@ -38,6 +37,7 @@ ChatRouter.post("/", authenticateToken,  async (req, res) => {
 // fetch all chats of a logged in user
 
 ChatRouter.get("/", authenticateToken, async (req, res) => {
+  const userId = req.userId
   try {
     const conversations = await prisma.conversation.findMany({
       where: { userId: req.userId },

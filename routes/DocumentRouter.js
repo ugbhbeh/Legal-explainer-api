@@ -21,7 +21,6 @@ DocumentRouter.post("/upload", authenticateToken, upload.single("file"), async (
       return res.status(400).json({ error: "No userId found" });
     }
     const doc = await parseAndStoreDocument(req.file, req.userId);
-    console.log('Document created, id:', doc.id);
     res.json({ documentId: doc.id });
   } catch (err) {
     console.error("Upload error:", err);
@@ -106,7 +105,7 @@ ${relevantText}
         tone: tone || "neutral",
       }
     });
-    console.log('Explanation created for document:', documentId);
+  
     return res.json({ answer: explanation });
   } catch (error) {
     console.error("Error in /document explain route:", error);
