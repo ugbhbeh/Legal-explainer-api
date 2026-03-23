@@ -14,7 +14,6 @@ async function explainLegalText(textOrOptions, optionalTone) {
   let contentToExplain;
   let tone;
 
-  // Handle both old and new calling styles
   if (typeof textOrOptions === 'string') {
     contentToExplain = textOrOptions;
     tone = optionalTone || 'simple';
