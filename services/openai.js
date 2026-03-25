@@ -36,9 +36,7 @@ async function explainLegalText(textOrOptions, optionalTone) {
   const prompt = `
     You are an AI legal assistant. Explain the following legal content in a ${tone} tone.
     Highlight anything risky or unusual if present.
-    Suggest changes or alternatives to what is presented if there is a better option.
     Text:
-    
     ${contentToExplain}
     `;
 
