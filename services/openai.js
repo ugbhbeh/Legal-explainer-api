@@ -34,11 +34,13 @@ async function explainLegalText(textOrOptions, optionalTone) {
   }
 
   const prompt = `
-You are an AI legal assistant. Explain the following legal content in ${tone} plain English.
-Avoid legal jargon. Highlight anything risky or unusual if present.
-Text:
-${contentToExplain}
-`;
+    You are an AI legal assistant. Explain the following legal content in a ${tone} tone.
+    Highlight anything risky or unusual if present.
+    Suggest changes or alternatives to what is presented if there is a better option.
+    Text:
+    
+    ${contentToExplain}
+    `;
 
   const response = await client.path("/chat/completions").post({
     body: {

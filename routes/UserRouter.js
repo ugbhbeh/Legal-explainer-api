@@ -6,8 +6,7 @@ const authenticateToken = require("../services/Auth")
 const UserRouter = Router();
 const prisma = new PrismaClient();
 
-//sign up 
-
+// sign up 
 UserRouter.post('/', async (req, res) => {
     try{
         const {email, name, password} = req.body

@@ -13,6 +13,7 @@ const DocumentRouter = require("./routes/DocumentRouter.js");
 
 const app = express();
 const httpServer = http.createServer(app); 
+
 const io = new Server(httpServer, {
     cors: {
         origin: "*",
@@ -20,14 +21,7 @@ const io = new Server(httpServer, {
     }
 });
 
-app.get("/", async (req, res) => {
-  const prisma = new PrismaClient();
-const users = await prisma.user.findMany();
-  res.json(users);
-});
-
 const port = 8080;
-
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));

@@ -40,8 +40,7 @@ async function parseAndStoreDocument(file, userId) {
     },
     include: { chunks: true },
   });
-
-
+  
   return docRecord;
 }
 

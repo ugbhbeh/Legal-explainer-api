@@ -120,7 +120,6 @@ DocumentRouter.delete("/:id", authenticateToken, async (req, res) => {
     const documentId = req.params.id;
     const userId = req.userId;
 
-    // Ensure the document belongs to the user
     const existingDoc = await prisma.document.findFirst({
       where: { id: documentId, userId },
     });
@@ -128,8 +127,7 @@ DocumentRouter.delete("/:id", authenticateToken, async (req, res) => {
     if (!existingDoc) {
       return res.status(404).json({ error: "Document not found" });
     }
-
-    // Delete chunks, explanations, and document in a single transaction
+    
     await prisma.$transaction([
       prisma.documentChunk.deleteMany({
         where: { documentId },
